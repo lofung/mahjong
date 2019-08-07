@@ -1,0 +1,36 @@
+honorslist = [31, 33, 35, 37, 39, 41, 43]
+mahjonglist= (list(range(1,10)) + list(range(11,20)) + list(range(21,30)) + honorslist ) *4
+                #dots               #characters         #bamboos
+mahjonglist.sort()
+
+
+#print("this is the whole lst of mahjong ")
+#print(mahjonglist)
+print("---------------------------------------------")
+
+import random
+
+m = input("input number draws after initial hand dealt \n")
+n = 0 #while loop counter
+j = 0 #double honour HAND counter
+
+while n < 1000000:
+    k = 0 #double honour counter
+    result = random.sample(mahjonglist, k=13 + int(m))
+    result.sort()
+    #print("-----------------------------------------")
+    #print(result)
+    for honors in honorslist:
+        if result.count(honors) > 1:
+            k = k + 1
+    #print("the number of honor pairs or triplet is " + str(k))
+    if k>1:
+        j = j+1
+    n = n + 1
+
+print("number of hands dealt n = " + str(n))
+print("number of draws after initial hand dealt = " + str(m))
+print("randomization of mahjong tiles = " + str(13+int(m)))
+print("number of hands with two or more honour pairs " + str(j))
+print("probability of two honours = " + str(j/n))
+print("error up to integer percentage.")
