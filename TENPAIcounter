@@ -1,0 +1,213 @@
+def checkstupid(hand):
+
+    if len(hand) < 13:
+        print("error hand less than 13!!!")
+
+    else:
+        print('hand is at least 13')
+        pass
+
+def sevenpairscounter(hand):
+
+    #checkstupid(hand)
+    if len(hand)>14:
+        return 98 #98 is error hand
+
+    hand.sort()
+
+    n = 0
+    paircount = 0
+    while len(hand)>1:
+        checkpair = hand[0]
+        if checkpair == hand[1]:
+            #print('foundpair ' +str(checkpair))
+            paircount = paircount +1
+            hand = list(filter(lambda a: a != checkpair, hand))
+            #print('remaining hand')
+            #print(hand)
+            #print('paircount=' + str(paircount))
+        else:
+            hand.pop(0)
+            print('pair not found, pop first element. remaining hand ')
+            print(hand)
+
+    pairshanten = 6 - paircount
+    # tenpai = 0
+    # mahjong = -1
+
+    return pairshanten
+
+
+def kokushicounter(hand):
+
+
+    honorslist = [410, 420, 430, 440, 450, 460, 470]
+
+    # 東南西北        #白發中
+    kokushi1 = [101, 109, 201, 209, 301, 309] + honorslist
+
+
+    kokushicount = 0
+    kokushipaircomplete = False
+    KOKUSHIhand = []
+
+    for card in hand:
+        if card in kokushi1:
+            KOKUSHIhand.append(card)
+
+    if len(KOKUSHIhand) != len(set(KOKUSHIhand)):
+        kokushicount = kokushicount +1
+        kokushipaircomplete = True
+
+    KOKUSHInewhand = []
+    for i in KOKUSHIhand:
+        if i not in KOKUSHInewhand:
+            KOKUSHInewhand.append(i)
+
+    kokushicount = kokushicount + len(KOKUSHInewhand)
+
+    kokushishanten = 13 - kokushicount
+    # tenpai = 0
+    # mahjong = -1
+
+    return(kokushishanten, kokushi1, kokushipaircomplete, KOKUSHInewhand)
+
+
+def verifymahjong(block):
+    #function return 1, then return 3-block is good
+    #function return 0, then completely break loop, hand is not ready or wrong eyes.
+    if len(block) == 0:
+    #if whole hand is checked, then return good mahjong hand.
+        return 1
+
+    if block[0] == block[1] and block[1] == block[2]:
+        # this is a triplet
+        print('this is triplet')
+        print(str(block[0]) + " " + str(block[1]) + " " + str(block[2]))
+        #delete triplet from the hand
+        block.pop(0)
+        block.pop(0)
+        block.pop(0)
+        #throw the rest of the hand back into verify mahjong.
+        if verifymahjong(block) == 1:
+            return 1
+        else:
+            return 0
+    else:
+        n = block[0]
+        if (n+1) in block and (n+2) in block:
+            #this is a run
+            print('this is a RUN')
+            print(str(n) + " " + str(n+1) + " " + str(n+2))
+            block.pop(0)
+            block.remove(n+1)
+            block.remove(n+2)
+            if verifymahjong(block) == 1:
+                return 1
+            else:
+                return 0
+            #check if run possible
+        else:
+            return 0
+
+
+def checkmahjong(hand):
+
+    #verify normal mahjong is for breaking down the whole hand other than the melded parts, not the broken hand.
+
+    #stupidtest
+    #if (len(hand) -1 ) %3 == 0 :
+    #    print('Normal Mahjong Tenpai reader handsize error')
+    #    return 98  #98 is error hand
+
+
+    hand.sort()
+    print('original hand is')
+    print(hand)
+
+
+    #remove duplicates in pair list
+    #pairlist = list(dict.fromkeys(pairlist))
+
+    #reset hand counter
+    n=0
+
+    while n < (len(hand) - 1):
+        #last card no need check
+        resthand = hand[:]  #hand reset
+        pairone = hand[n]
+        pairtwo = hand[n+1]
+        print('----------------------------------------------------------------')
+        print('pair checking is [ ' + str(pairone) + '  ' + str(pairtwo) + ' ]')  # verify print
+
+
+        if pairone == pairtwo:
+            resthand.remove(pairone)
+            resthand.remove(pairtwo)
+            if verifymahjong(resthand) == 1:
+                print('MAHJONG')
+                print(hand)
+                return 1 #return 1 is mahjong 埋葬
+        else:
+            print('not a pair')
+
+        n = n+1 #next tile test pair
+
+    else:
+        return 0 #0 is no-mahjong
+
+
+
+
+
+def checkmahjongblock_obsolete(row):
+    n = row[0]
+    if len(row) == 3:
+        if row[0]==row[1] and row[1]==row[2]:
+            #this is a triplet
+            print('this is triplet')
+            print(row)
+            return 1
+        elif row[0] == n and row[1] == (n+1) and row[2] == (n+2):
+            #this is a run
+            print('this is a run')
+            print(row)
+            return 1
+        else:
+            print('this is not a run or triplet')
+            print(row)
+            return 0
+
+    print ('error in checkmahjongblock function, not a triplet or ruin')
+    print (row)
+    return 9 #return error
+
+def verifymahjong_obsolete(block):
+
+    handmatrix = [[0]*3 for i in range(5)]
+    k = 0
+
+    #print(handmatrix)
+
+    while k < len(block):
+        # m x n matrix, m is downwards, n is rightwards
+        #python array[m][n] starting from ZERO
+        m = k // 3
+        #print(m)
+        n = k % 3
+        #print(n)
+        handmatrix[m][n] = block[k]
+        k = k + 1
+
+    #remove zero rows from the list
+    handmatrix = list(filter(lambda a: a != [0, 0, 0], handmatrix))
+
+    mahjongmatrix = []
+    k = 0
+    for row in handmatrix:
+        if checkmahjongblock(row) == 0:
+            return 0 #return no mahjong
+
+    return 1 #return mahjong = 1
+
+
